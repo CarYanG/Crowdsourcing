@@ -1,5 +1,4 @@
 #--*-- coding:utf-8 --*--
-__author__ = 'carl'
 import random
 import math
 
@@ -39,9 +38,13 @@ class QualityControl:
     def getGolden(self):  #获取标准答案
         file =open ("data/ic_data_golden")
         try:
-            allGolden = file.readlines()
+            content = file.readlines()
         finally:
             file.close()
+        allGolden=[]
+        for item in content:
+            lists = item.strip("\n")
+            allGolden.append(lists)
         return  allGolden
 
     def selectWorker(self):  #选出初始工作者集合
@@ -69,7 +72,7 @@ class QualityControl:
                 restlist[item]=self.currentWork[item]
 
         minError =sorted(restlist.values())[0]   #找到错误率的最小值
-        for item in restlist:                   #找到拥有最小错误率的workid，并进行替换
+        for item in restlist:                   #找到拥有最小错误率的workid，并进行替换【这段代码可以简单一点】
             if restlist[item]==minError:
                 self.currentWork.remove(workid)
                 self.currentWork.append(item)
@@ -108,33 +111,23 @@ class QualityControl:
             for item in self.currentWork:
                 workerParam[item]=[]
 
-            for workerid in workerParam: #我们第一次测试先三个人的情况
+            for workerid in workerParam: #当多个工作者的时候，这里暂且选择随即选取的方式作为S和T
                 current=self.currentWork
                 current.remove(workerid)
-                workerParam[workerid].append(self.countAgree(workerAnswer[workerid],workerAnswer[current[0]])/float(self.tasksteps))
-                workerParam[workerid].append(self.countAgree(workerAnswer[workerid],workerAnswer[current[1]])/float(self.tasksteps))
-                workerParam[workerid].append(self.countAgree(workerAnswer[current[0]],workerAnswer[current[1]])/float(self.tasksteps))
+                workerParam[workerid].append(self.countAgree(workerAnswer[workerid],workerAnswer[current[random.randint(0,len(current)-1)]])/float(self.tasksteps))
+                workerParam[workerid].append(self.countAgree(workerAnswer[workerid],workerAnswer[current[random.randint(0,len(current)-1)]])/float(self.tasksteps))
+                workerParam[workerid].append(self.countAgree(workerAnswer[current[random.randint(0,len(current)-1)]],workerAnswer[current[random.randint(0,len(current)-1)]])/float(self.tasksteps))
 
-                workerid.
+                #计算错误率
+                error=self.countError(workerParam[workerid][0],workerParam[workerid][1],workerParam[workerid][2])
 
-def getAnswer():  #获取用户答案 一个二维列表，每一行是一个用户的所有答案
-    file = open("data/ic_data")
-    try:
-        content = file.readlines()
-    finally:
-        file.close()
-
-    allAnswer=[]
-    for item in content:
-        lists = item.strip("\n").split(" ")
-        allAnswer.append(lists)
-
-    return  map(list,zip(*allAnswer))
+                #更新错误率
+                self.userError[workerid]=error
 
 
-a=getAnswer()
-print type(a)
-print a[1][4]
+                workerid
+
+
 
 
 

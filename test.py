@@ -1,4 +1,3 @@
-__author__ = 'carl'
 #--*-- coding:utf-8 --*--
 import random
 
@@ -57,3 +56,15 @@ for i in range(10):
 
 workerAnswer=[[] for i in range(4)]
 print workerAnswer
+
+a=random.randint(0,10)
+print a
+
+print "----------------我是一条分割线------------------"
+
+userError={}
+
+userError[1]=12
+userError[2]=11
+
+print min(userError.items(),key=lambda x:x[1])[0]
