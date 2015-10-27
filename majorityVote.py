@@ -33,7 +33,6 @@ class majorityVote:
 
     def vote(self,taskid):
         answer=self.getAnswer()
-
         voteResult={}  #作为投票的结果
         for i in range(len(answer)):  #len(answer)表示工作者的个数
             if answer[i][taskid] not in voteResult:

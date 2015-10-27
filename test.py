@@ -68,3 +68,11 @@ userError[1]=12
 userError[2]=11
 
 print min(userError.items(),key=lambda x:x[1])[0]
+
+print len(userError)
+
+c={"a":1,"b":2,"d":-1,"c":0}
+for item in c :
+
+    print item
+
