@@ -28,7 +28,7 @@ class majorityVote:
         allGolden=[]
         for item in content:
             lists = item.strip("\n")
-            allGolden.append(lists)
+            allGolden.append(int(lists))
         return  allGolden
 
     def vote(self,taskid):
@@ -48,7 +48,7 @@ class majorityVote:
 
         count=0
         for i in range(len(golden)):
-            if golden[i]==self.vote(i):
+            if golden[i]==int(self.vote(i)):
                 count+=1
 
         print count
