@@ -67,6 +67,7 @@ userError={}
 userError[1]=12
 userError[2]=11
 
+print userError.items()
 print min(userError.items(),key=lambda x:x[1])[0]
 
 print len(userError)

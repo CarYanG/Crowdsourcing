@@ -8,7 +8,7 @@ class QualityControl:
 
         self.workernum=workernum  #每一轮工作的用户数(工作者)
 
-        self.tasknum=tasknum  #任务总数
+        self.tasknum=tasknum  #任务总数`
 
         self.tasksteps=tasksteps  #每一轮需要完成的任务数
 
@@ -53,16 +53,18 @@ class QualityControl:
         alist=[]  #模拟全部工作者集合
         for i in range(self.usernum):
             alist.append(i)
-        print alist
+        print ("all the user ",alist)
         selectList = random.sample(alist, self.workernum) #从全部工作者中选取worker来进行本轮的工作，个数为workernum
 
         for item in selectList :
             self.currentWork.append(item)    #更新当前工作者集合
 
+        print ("first choosen user",self.currentWork )
+
 
     def selectTask(self,turn):
         taskList=[]
-        for i in range((turn-1)*self.tasksteps,(turn-1)*self.tasksteps+self.tasksteps):
+        for i in range((turn-1)*self.tasksteps,(turn-1)*self.tasksteps+self.tasksteps):    #turn从1开始计算？
             taskList.append(i)
         return taskList
 
@@ -77,6 +79,7 @@ class QualityControl:
             if restlist[item]==minError:
                 self.currentWork.remove(workid)
                 self.currentWork.append(item)
+                print "we choose a "
                 break
 
 
@@ -93,20 +96,31 @@ class QualityControl:
     def vote(self,workerAnswer,i):
         voteResult={}  #作为投票的结果,投票时以正确率作为权重
         for item in workerAnswer:
-            if workerAnswer[item][i] not in voteResult:
-                voteResult[workerAnswer[item][i]]=1
-            else:
-                voteResult[workerAnswer[item][i]]+=(1-self.userError[item])
+            if workerAnswer[item][i] !=-1:
+                if workerAnswer[item][i] not in voteResult:
+                    voteResult[workerAnswer[item][i]]=1
+                else:
+                    voteResult[workerAnswer[item][i]]+=(1-self.userError[item])
         return max(voteResult.items(),key=lambda x:x [1])[0]
 
     def process(self):
         answers=self.getAnswer()
         golden=self.getGolden()
         self.selectWorker()
-        count=0
-        for i in range(self.phasenum):
-            selectedTask=self.selectTask(i)
 
+
+        workerParam={} #设计一个字典，用来表示每个被选中的工作者的一些参数（与其他工作者相同答案的个数），用于计算错误率，key为workid，value为参数值（list形式）,
+        # 这里要改，因为每一次迭代worker就清空了，应该有之前的记录
+        for item in self.currentWork:
+            workerParam[item]=[0 for i in range(3)]
+        print "workerParam ",workerParam
+
+
+        count=0.0
+        for i in range(1,self.phasenum):
+            print i," turn start ************************************************************"
+            selectedTask=self.selectTask(i)
+            print ("selectedtask",selectedTask)
             workerAnswer={}  #设计一个字典，用来表示每个被选中的工作者的答案，key为workid，value为工作者本轮的答案(list形式)
             for item in self.currentWork:
                 workerAnswer[item]=[]
@@ -115,17 +129,16 @@ class QualityControl:
                 for workerid in workerAnswer:
                     workerAnswer[workerid].append(answers[workerid][taskid])
 
+            print workerAnswer
 
-            workerParam={} #设计一个字典，用来表示每个被选中的工作者的一些参数（与其他工作者相同答案的个数），用于计算错误率，key为workid，value为参数值（list形式）,
-            # 这里要改，因为每一次迭代worker就清空了，应该有之前的记录
-            for item in self.currentWork:
-                workerParam[item]=[0 for i in range(3)]
 
             for workerid in workerAnswer: #当多个工作者的时候，这里暂且选择随即选取的方式作为S和T,还得再改
+                print "Now we evaluate worker", workerid
                 othercurrent=[]
                 for item in self.currentWork:
                     othercurrent.append(item)
                 othercurrent.remove(workerid)
+                print "othercurrent",othercurrent
 
                 workerParam[workerid][0]=workerParam[workerid][0]+self.countAgree(workerAnswer[workerid],workerAnswer[othercurrent[random.randint(0,len(othercurrent)-1)]])
                 workerParam[workerid][1]=workerParam[workerid][1]+self.countAgree(workerAnswer[workerid],workerAnswer[othercurrent[random.randint(0,len(othercurrent)-1)]])
@@ -138,9 +151,11 @@ class QualityControl:
                 #更新错误率
                 self.userError[workerid]=error
 
-                #错误率太大需要替换，同时将此人的答案剔除出去
+                #错误率太大需要替换，同时将此人的答案剔除出去（或者标记为false）
                 if error>self.threshold:
-                    del workerAnswer[workerid]
+                    print "someone is out of the current worker team ", workerid
+                    #del workerAnswer[workerid]   #这一句会引起bug，在workerAnswer中循环却又改变workerAnswer的大小
+                    workerAnswer[workerid]=-1
                     self.substituteWorker(workerid)
 
             #统计正确答案的个数
@@ -148,11 +163,13 @@ class QualityControl:
                 if golden[taskid]==self.vote(workerAnswer,selectedTask.index(taskid)):
                     count=count+1
 
+        print "let us see our worker's error rate:"
         print self.userError
+        print "the final result:"
         print (float)(count)/self.tasknum
 
 
-test=QualityControl(19,5,48,6,0.3)
+test=QualityControl(19,5,48,6,0.1)
 test.process()
 
 
