@@ -78,3 +78,7 @@ for item in c :
     print item
 print "----------------我是一条分割线20160416------------------"
 print "对的" if 1==0 else "错的"
+badworker=[]
+for workerid in badworker:
+    print "someone is out of the current worker team ", workerid
+

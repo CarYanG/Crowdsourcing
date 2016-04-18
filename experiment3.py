@@ -3,7 +3,7 @@ import random
 import math
 
 class QualityControl:
-    def __init__(self,usernum, workernum,tasknum, tasksteps,threshold):
+    def __init__(self,usernum, workernum,tasknum, tasksteps,threshold1,threshold2):
         self.usernum = usernum  #用户总数
 
         self.workernum = workernum  #每一轮工作的用户数(工作者)
@@ -21,8 +21,9 @@ class QualityControl:
 
         self.currentWork=[] #当前工作者的集合
 
-        self.threshold=threshold #错误率的阈值
+        self.threshold1=threshold1 #第一阶段错误率的阈值，即从全部工作者淘汰时用到的阈值（此时不进行替换）
 
+        self.threshold2=threshold2 #第二阶段错误率的阈值，即进行替换阶段时用到的的阈值
     def getAnswer(self):  #获取用户答案 一个二维列表，每一行是一个用户的所有答案
          file = open("data/ic_data")
          try:
@@ -49,15 +50,15 @@ class QualityControl:
             allGolden.append(lists)
         return  allGolden
 
-    def selectWorker(self):  #选出初始工作者集合
-        alist=[]  #模拟全部工作者集合
+    def selectWorker(self):  #刚开始我们选择所有的工作者作为初始工作者集合，在随后的每一轮工作中，逐步淘汰掉错误率高的工作者，直到工作者集合的大小达到我们想要的值。
+        alllist=[]  #模拟全部工作者集合
         for i in range(self.usernum):
-            alist.append(i)
-        print ("all the user ",alist)
-        selectList = random.sample(alist, self.workernum) #从全部工作者中选取worker来进行本轮的工作，个数为workernum
+            alllist.append(i)
+        print ("all the user ",alllist)
+        # selectList = random.sample(alist, self.workernum) #从全部工作者中选取worker来进行本轮的工作，个数为workernum
 
-        for item in selectList :
-            self.currentWork.append(item)    #更新当前工作者集合
+        for item in alllist :
+            self.currentWork.append(item)    #当前工作者集合即所有工作者
 
         print ("first choosen user",self.currentWork )
 
@@ -138,9 +139,13 @@ class QualityControl:
                     workerAnswer[workerid].append(answers[workerid][taskid])
 
             print workerAnswer
+            print "current worker list :",workerAnswer.keys()
 
-            badworker=[]  #标记作为下轮要被替换出去的工作者
+            awfulworker = []  # 标记作为下轮要被淘汰出去的工作者
+            badworker=[]     #标记作为下轮要被替换出去的工作者
+
             for workerid in workerAnswer: #当多个工作者的时候，这里暂且选择随即选取的方式作为S和T,还得再改
+                print "*"
                 print "Now we evaluate worker", workerid
                 othercurrent=[]
                 for item in self.currentWork:
@@ -164,22 +169,31 @@ class QualityControl:
                 #更新错误率
                 self.userError[workerid]=error
 
-                #错误率太大需要替换，同时将此人的答案剔除出去（或者标记为false）
-                if error>=self.threshold:
-                    #del workerAnswer[workerid]   #这一句会引起bug，在workerAnswer中循环却又改变workerAnswer的大小
-                    workerAnswer[workerid]=[-1 for i in range(self.tasksteps) ]        #将这个被替换出去的工作者的答案设为-1，即空答案
-                    badworker.append(workerid)
-                    print workerid,"has been into badworker list"
+
+                if (len(self.currentWork)-len(awfulworker)>self.workernum):  #此时还处于第一阶段，应当进行淘汰，并不替换
+                    if error >= self.threshold1:        #错误率太大需要淘汰掉，同时将此人的答案剔除出去（或者标记为false）
+                        workerAnswer[workerid] = [-1 for i in range(self.tasksteps)]
+                        awfulworker.append(workerid)
+                        print workerid, "has been into awfulworker list"
+                else:
+                    if error>=self.threshold2:                      #此时处于第二阶段，即淘汰阶段
+                        #del workerAnswer[workerid]   #这一句会引起bug，在workerAnswer中循环却又改变workerAnswer的大小
+                        workerAnswer[workerid]=[-1 for i in range(self.tasksteps) ]        #将这个被替换出去的工作者的答案设为-1，即空答案
+                        badworker.append(workerid)
+                        print workerid,"has been into badworker list"
 
 
             #统计正确答案的个数吗，不包含被淘汰工作者的成绩
             for taskid in selectedTask:
                 if golden[taskid]==self.vote(workerAnswer,selectedTask.index(taskid)):
                     count=count+1
-
-            #开始替换本轮应该被淘汰的工作者
-            for workerid in badworker:
+            #开始进行淘汰
+            for workerid in awfulworker:
                 print "someone is out of the current worker team ", workerid
+                self.currentWork.remove(workerid);
+            #开始进行替换
+            for workerid in badworker:
+                print "someone is substituted of the current worker team ", workerid
                 self.substituteWorker(workerid)
 
         print "let us see our worker's error rate:"
@@ -188,7 +202,7 @@ class QualityControl:
         print (float)(count)/self.tasknum
 
 
-test=QualityControl(19,10,48,12,0.1)
+test=QualityControl(19,10,48,12,0.1,0.05)
 test.process()
 
 
