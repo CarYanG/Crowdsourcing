@@ -25,7 +25,7 @@ class QualityControl:
 
         self.threshold2=threshold2 #第二阶段错误率的阈值，即进行替换阶段时用到的的阈值
     def getAnswer(self):  #获取用户答案 一个二维列表，每一行是一个用户的所有答案
-         file = open("data/ic_data")
+         file = open("data/sports_questions_data")
          try:
              content = file.readlines()
          finally:
@@ -33,13 +33,13 @@ class QualityControl:
 
          allAnswer=[]
          for item in content:
-             lists = item.strip("\n").split(" ")
+             lists = item.strip("\n").split(", ")
              allAnswer.append(lists)
 
          return  map(list,zip(*allAnswer))
 
     def getGolden(self):  #获取标准答案
-        file =open ("data/ic_data_golden")
+        file =open ("data/sports_questions_data_golden")
         try:
             content = file.readlines()
         finally:
@@ -94,7 +94,7 @@ class QualityControl:
         return count
 
     def countError(self,q12,q13,q23):  #计算用户的错误率
-
+        print q12,q13,q23
         if(q23<=0.5):
             q23=0.55
         if(((q12-0.5)*(q13-0.5))/ (2*(q23-0.5))<0):
@@ -187,6 +187,7 @@ class QualityControl:
             for taskid in selectedTask:
                 if golden[taskid]==self.vote(workerAnswer,selectedTask.index(taskid)):
                     count=count+1
+
             #开始进行淘汰
             for workerid in awfulworker:
                 print "someone is out of the current worker team ", workerid
@@ -202,7 +203,7 @@ class QualityControl:
         print (float)(count)/self.tasknum
 
 
-test=QualityControl(19,10,48,12,0.1,0.05)
+test=QualityControl(16,16,44,11,1,1)
 test.process()
 
 

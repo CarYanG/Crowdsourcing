@@ -82,3 +82,5 @@ badworker=[]
 for workerid in badworker:
     print "someone is out of the current worker team ", workerid
 
+voteResult={1:0,0:0}
+print max(voteResult.items(),key=lambda x:x [1])[0]

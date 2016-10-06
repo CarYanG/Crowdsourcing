@@ -6,7 +6,7 @@ class majorityVote:
 
 
     def getAnswer(self):  #获取用户答案 一个二维列表，并使每一行是一个用户的所有答案
-             file = open("data/ic_data")
+             file = open("data/sports_questions_data")
              try:
                  content = file.readlines()
              finally:
@@ -14,12 +14,12 @@ class majorityVote:
 
              allAnswer=[]
              for item in content:
-                 lists = item.strip("\n").split(" ")
+                 lists = item.strip("\n").split(",")
                  allAnswer.append(lists)
              return  map(list,zip(*allAnswer))
 
     def getGolden(self):  #获取标准答案
-        file =open ("data/ic_data_golden")
+        file =open ("data/sports_questions_data_golden")
         try:
             content = file.readlines()
         finally:
