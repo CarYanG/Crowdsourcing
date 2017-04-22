@@ -1,5 +1,9 @@
 #-*-coding:utf-8 -*-
 __author__ = 'carl'
+#data_2和data_1是原始数据
+#data_2和data_2_golden对应cooking makeup data
+
+#data_1和data_1_golden 对应 sports questions data
 
 def getAnswer():  #获取用户答案
          file = open("data/data_2")
@@ -41,7 +45,8 @@ c=set(b)
 for i in range(25,40) :
     c=c&set(a[i])
 
-print c
+print "可以采用的问题的ID(这些问题是这16个人共同回答的)" ,c
+print "可以采用的问题数量是",len(c)
 
 
 print "-----------i am a line ------------------"
@@ -91,22 +96,20 @@ def getAnswer2():  #获取用户答案
          for i in range(25,41):
              answers[i]={}
 
-         dddd=[0, 1, 2, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 31, 32, 33, 35, 36, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]
-
+         questionID=[0, 1, 2, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 31, 32, 33, 35, 36, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]
+         print  "问题数量是",len(questionID)
          print len(allAnswer)
-         #bbbb=set(allAnswer)
-         #print len(bbbb)
          print type(allAnswer)
 
 
          for i in range(25,41):
-             haha={}
+             tempAnswer={}
              for item in allAnswer:
                  if int(item[0]) ==i:
-                     if int(item[1]) in dddd:
-                         haha[int(item[1])]=int(item[2])
+                     if int(item[1]) in questionID:
+                         tempAnswer[int(item[1])]=int(item[2])
 
-             answers[i]=haha
+             answers[i]=tempAnswer
 
 
 
@@ -123,12 +126,13 @@ for item in a:
 print len(a)
 print len(a[item])
 print a.keys()
-print "-----------i am a line 3  ------------------"
 
-aaaa=[]
-for item in a:
-    aaaa.append(a[item].values())
+# print "-----------i am a line 3  ------------------"
 
-ccc= map(list,zip(*aaaa))
-for item in ccc:
-    print item
+# aaaa=[]
+# for item in a:
+#     aaaa.append(a[item].values())
+
+# ccc= map(list,zip(*aaaa))
+# for item in ccc:
+#     print item

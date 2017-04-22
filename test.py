@@ -1,6 +1,6 @@
 #--*-- coding:utf-8 --*--
 import random
-
+import math
 
 a = [ [1,2,3], ["a","c","b"], [4,5,6], [7,8,9], ["e","f","g"]]
 
@@ -72,10 +72,8 @@ print min(userError.items(),key=lambda x:x[1])[0]
 
 print len(userError)
 
-c={"a":1,"b":2,"d":-1,"c":0}
-for item in c :
 
-    print item
+
 print "----------------我是一条分割线20160416------------------"
 print "对的" if 1==0 else "错的"
 badworker=[]
@@ -84,3 +82,20 @@ for workerid in badworker:
 
 voteResult={1:0,0:0}
 print max(voteResult.items(),key=lambda x:x [1])[0]
+
+print math.sqrt(0.28125)
+
+for item in range(1,7):
+    print item
+
+test=[1,2,3,4]
+print test
+test=[-1 for m in range(5)]
+print test
+
+
+print "***************"
+c={"aa":11,"bb":22,"dd":44,"cc":33}
+sorted(c.items(), key=lambda item : item[1],reverse=True)  #False是升序
+for item in c:
+    print c[item]
