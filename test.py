@@ -1,6 +1,7 @@
 #--*-- coding:utf-8 --*--
 import random
 import math
+import types
 
 a = [ [1,2,3], ["a","c","b"], [4,5,6], [7,8,9], ["e","f","g"]]
 
@@ -96,6 +97,12 @@ print test
 
 print "***************"
 c={"aa":11,"bb":22,"dd":44,"cc":33}
-sorted(c.items(), key=lambda item : item[1],reverse=True)  #False是升序
-for item in c:
-    print c[item]
+oo={}
+oo=sorted(c.items(), key=lambda item : item[1],reverse=True)  #False是升序
+
+print oo
+
+print isinstance(oo,list)
+print oo[0][0]
+
+

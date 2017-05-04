@@ -3,7 +3,7 @@ import random
 import math
 
 class QualityControl:
-    def __init__(self,usernum, workernum,tasknum, tasksteps,threshold):
+    def __init__(self,usernum, workernum,tasknum, tasksteps):
         self.usernum = usernum  #用户总数
 
         self.workernum = workernum  #优质工作者集合的人数
@@ -18,7 +18,6 @@ class QualityControl:
 
         self.userHistoryError={}   #用户的历史错误率字典,key为workerid，value为历史错误率Ea
 
-        self.threshold=threshold #进行替换阶段时用到的的阈值
 
     def getAnswer(self):  #获取用户答案 一个二维列表，每一行是一个用户的所有答案
          file = open("data/ic_data")
@@ -51,7 +50,7 @@ class QualityControl:
         answers=self.getAnswer();
         for i in range(self.usernum):
             self.currentWork.append(i)  # 当前工作者集合即所有工作者
-        print ("first choosen user", self.currentWork)
+        print ("initialization choosen user", self.currentWork)
 
         workerAnswer = {}  # 设计一个字典，用来表示每个被选中的工作者的答案，key为workid，value为工作者本轮的答案(list形式)
 
@@ -62,7 +61,6 @@ class QualityControl:
             for workerid in workerAnswer:
                 workerAnswer[workerid].append(answers[workerid][taskid])
 
-        print "initialization worker answer:", workerAnswer
         print "initialization worker list :", workerAnswer.keys()
 
         workerParam = {}  # 设计一个字典，用来表示所有在工作中的工作者的一些参数（与其他工作者相同答案的个数），
@@ -96,13 +94,15 @@ class QualityControl:
             print "initialization HistoryError(Ea) about ", workerid, " is ", error
             self.userHistoryError[workerid]=error
 
-        sorted(self.userHistoryError.items(), key=lambda item: item[1], reverse=False) #False是升序
-        此处要修改，因为字典并没有改变
+        sorted_UserH=sorted(self.userHistoryError.items(), key=lambda item: item[1], reverse=False) #False是升序
+
         print "initialization userHistoryError ", self.userHistoryError
 
         self.currentWork=[]
         for item in range (self.workernum):
-            self.currentWork.append(self.userHistoryError.keys(item))
+            self.currentWork.append(sorted_UserH[item][0])
+
+        print "initialization:currentworker",self.currentWork
         print "initialization completed"
 
 
@@ -237,13 +237,15 @@ class QualityControl:
 
             #需要替换的人数
             badworkerNumber=(int)(self.workernum*0.3)
-            sorted(workerEb.items(),key=lambda item:item[1],reverse=True) #False是升序
-            此处要修改，因为字典并没有改变
-            print workerEb;
+            sorted_workerEb=sorted(workerEb.items(),key=lambda item:item[1],reverse=True) #False是升序
+
+            #sorted_workerEb是一个list,按照worker的Eb降序排列  sorted_workerEb[i][0]  表示第i个员工workerid，sorted_workerEb[i][1]表示第i个员工的Eb
+
+            print sorted_workerEb;
             for item in range(badworkerNumber):
-                workerAnswer[workerEb.keys(item)] = [-1 for m in range(self.tasksteps)]  # 将这个被替换出去的工作者的答案设为-1，即空答案
-                badworker.append(workerid)
-                print workerEb.keys(item), "has been into badworker list,and his answer has become :", workerAnswer[workerEb.keys(item)]
+                workerAnswer[sorted_workerEb[item][0]] = [-1 for m in range(self.tasksteps)]  # 将这个被替换出去的工作者的答案设为-1，即空答案
+                badworker.append(sorted_workerEb[item][0])
+                print sorted_workerEb[item][0], "has been into badworker list,and his answer has become :", workerAnswer[sorted_workerEb[item][0]]
 
             #统计正确答案的个数，不包含被替代工作者的成绩
             for taskid in selectedTask:
@@ -262,7 +264,7 @@ class QualityControl:
         print (float)(count)/self.tasknum
 
 
-test=QualityControl(19,3,48,8,0.2)
+test=QualityControl(19,10,48,8)
 test.process()
 
 
